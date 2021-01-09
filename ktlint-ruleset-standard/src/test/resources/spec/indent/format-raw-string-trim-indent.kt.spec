@@ -62,9 +62,7 @@ _""".trimIndent())
         [*]
         end_of_line = lf
     """.trimIndent().toByteArray())
-            SpacingAroundKeywordRule().format(
-                // string below is indented with tabs and spaces should and should therefore not be autocorrected as this can
-                // not been done reliable. This will be fixed in a separate PR.
+            SpacingAroundKeywordRule().format( // string below is indented with tabs and spaces and will not be changed
                 """
             var x: String
 			    get () {
