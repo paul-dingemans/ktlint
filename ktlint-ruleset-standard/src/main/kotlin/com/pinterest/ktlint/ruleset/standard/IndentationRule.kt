@@ -39,6 +39,7 @@ import com.pinterest.ktlint.core.ast.ElementType.OBJECT_LITERAL
 import com.pinterest.ktlint.core.ast.ElementType.OPEN_QUOTE
 import com.pinterest.ktlint.core.ast.ElementType.OPERATION_REFERENCE
 import com.pinterest.ktlint.core.ast.ElementType.PARENTHESIZED
+import com.pinterest.ktlint.core.ast.ElementType.PROPERTY
 import com.pinterest.ktlint.core.ast.ElementType.PROPERTY_ACCESSOR
 import com.pinterest.ktlint.core.ast.ElementType.RBRACE
 import com.pinterest.ktlint.core.ast.ElementType.RBRACKET
@@ -509,8 +510,15 @@ class IndentationRule : Rule("indent"), Rule.Modifier.RestrictToRootLast {
                         //     })
                         adjustExpectedIndentInsideSuperTypeCall(n, ctx)
                     }
-                    STRING_TEMPLATE ->
-                        indentStringTemplate(n, autoCorrect, emit, editorConfig)
+                    STRING_TEMPLATE -> {
+                        if (n.isPropertyValueAssignment() && n.isNotPrecededByNewlineOrEndOfLineComment()) {
+                            expectedIndent++
+                            indentStringTemplate(n, autoCorrect, emit, editorConfig)
+                            expectedIndent--
+                        } else {
+                            indentStringTemplate(n, autoCorrect, emit, editorConfig)
+                        }
+                    }
                     DOT_QUALIFIED_EXPRESSION, SAFE_ACCESS_EXPRESSION, BINARY_EXPRESSION, BINARY_WITH_TYPE -> {
                         val prevBlockLine = ctx.blockOpeningLineStack.peek() ?: -1
                         if (prevBlockLine == line) {
@@ -1042,6 +1050,12 @@ private fun EditorConfig.wrongIndentChar(): Pair<Char, String> =
         IndentStyle.TAB -> Pair(' ', "space")
     }
 
+private fun ASTNode.isPropertyValueAssignment() =
+    prevCodeLeaf()?.elementType == EQ && prevCodeLeaf()?.treeParent?.elementType == PROPERTY
+
+private fun ASTNode.isNotPrecededByNewlineOrEndOfLineComment() =
+    prevLeaf().isWhiteSpaceWithoutNewline() && prevCodeLeaf()?.elementType != EOL_COMMENT
+
 private fun ASTNode.isLiteralStringTemplateEntry() =
     elementType == LITERAL_STRING_TEMPLATE_ENTRY && text != "\n"
 
@@ -1095,3 +1109,29 @@ private fun String.splitIndentAt(index: Int): Pair<String, String> {
 
 private fun String.indexOfFirst(char: Char) =
     indexOfFirst { it == char }
+
+private fun String.splitAtLast(char: Char, excludeSplitChar: Boolean = false): Triple<String, Boolean, String> {
+    return lastIndexOf(char)
+        .let {
+            when {
+                it < 0 ->
+                    // Char not found
+                    Triple("", false, this)
+                it == length - 1 && excludeSplitChar ->
+                    // Char found at last position and needs to be excluded
+                    Triple(this.take(length - 1), true, "")
+                else -> {
+                    val startIndexLastPart = if (excludeSplitChar && it + 1 < length) {
+                        it + 1
+                    } else {
+                        it
+                    }
+                    Triple(
+                        this.take(it),
+                        true,
+                        this.substring(startIndexLastPart)
+                    )
+                }
+            }
+        }
+}

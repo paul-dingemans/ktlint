@@ -79,13 +79,13 @@ _""".trimIndent())
 
 class C {
     val CONFIG_COMPACT = """
-        {
-        }
+            {
+            }
         """.trimIndent()
     val CONFIG_COMPACT = // comment
         """
-        {
-        }
+            {
+            }
         """.trimIndent()
 
     fun getBazelWorkspaceContent(blueprint: BazelWorkspaceBlueprint) =

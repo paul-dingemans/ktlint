@@ -1,6 +1,7 @@
 package com.pinterest.ktlint.ruleset.standard
 
 import com.pinterest.ktlint.core.LintError
+import com.pinterest.ktlint.test.assertThatFileFormat
 import com.pinterest.ktlint.test.diffFileFormat
 import com.pinterest.ktlint.test.diffFileLint
 import com.pinterest.ktlint.test.format
@@ -141,7 +142,7 @@ internal class IndentationRuleTest {
     }
 
     @Test
-    fun testFormatPropertyAccessor() {
+    fun `format property accessor`() {
         assertThat(
             IndentationRule().diffFileFormat(
                 "spec/indent/format-property-accessor.kt.spec",
@@ -152,6 +153,10 @@ internal class IndentationRuleTest {
 
     @Test
     fun testFormatRawStringTrimIndent() {
+        IndentationRule().assertThatFileFormat(
+            "spec/indent/format-raw-string-trim-indent.kt.spec",
+            "spec/indent/format-raw-string-trim-indent-expected.kt.spec"
+        )
         assertThat(
             IndentationRule().diffFileFormat(
                 "spec/indent/format-raw-string-trim-indent.kt.spec",
@@ -1127,6 +1132,42 @@ internal class IndentationRuleTest {
                 """.trimIndent()
             )
         ).isEmpty()
+    }
+
+    @Test
+    fun `format multiline string in property value`() {
+        val code = """
+            class C {
+                val CONFIG_COMPACT = $MULTILINE_STRING_QUOTE
+                text1
+                $MULTILINE_STRING_QUOTE.trimIndent()
+                val CONFIG_COMPACT = // comment
+                        $MULTILINE_STRING_QUOTE
+                        text2
+                        $MULTILINE_STRING_QUOTE.trimIndent()
+            }
+            """.trimIndent()
+        val expectedCode = """
+            class C {
+                val CONFIG_COMPACT = $MULTILINE_STRING_QUOTE
+                    text1
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+                val CONFIG_COMPACT = // comment
+                    $MULTILINE_STRING_QUOTE
+                    text2
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+            }
+            """.trimIndent()
+        assertThat(IndentationRule().lint(code)).isEqualTo(
+            listOf(
+                LintError(3, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(4, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(6, 1, "indent", "Unexpected indentation (12) (should be 8)"),
+                LintError(7, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(8, 1, "indent", "Unexpected indent of multiline string"),
+            )
+        )
+        assertThat(IndentationRule().format(code)).isEqualTo(expectedCode)
     }
 
     private companion object {
