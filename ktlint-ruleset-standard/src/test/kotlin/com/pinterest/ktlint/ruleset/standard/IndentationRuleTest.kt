@@ -1,7 +1,6 @@
 package com.pinterest.ktlint.ruleset.standard
 
 import com.pinterest.ktlint.core.LintError
-import com.pinterest.ktlint.test.assertThatFileFormat
 import com.pinterest.ktlint.test.diffFileFormat
 import com.pinterest.ktlint.test.diffFileLint
 import com.pinterest.ktlint.test.format
