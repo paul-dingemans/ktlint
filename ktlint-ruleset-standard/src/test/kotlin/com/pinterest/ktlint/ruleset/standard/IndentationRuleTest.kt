@@ -855,6 +855,117 @@ internal class IndentationRuleTest {
     }
 
     @Test
+    fun `format variable with multiline string value`() {
+        val code =
+            """
+            val foo1 = $MULTILINE_STRING_QUOTE
+                    line1
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            val foo2 =
+                $MULTILINE_STRING_QUOTE
+                    line2
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            val foo3 = // comment
+                $MULTILINE_STRING_QUOTE
+                    line3
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            """.trimIndent()
+        /*
+        // TODO: What is the proper way to indent a multi line string value?
+        //     val foo =
+        //        """
+        //        line1
+        //        line2
+        //        """
+        //  or
+        //     val foo = """
+        //        line1
+        //        line2
+        //        """
+        //  or
+        //     val foo = """
+        //     line1
+        //     line2
+        //     """
+        //  or
+        //     val foo = """
+        //        line1
+        //        line2
+        //     """
+        // First option would be most in line with function parameter. Second option is also acceptable. Third option
+        // (previous behavior) is not logical as there is no continuation kind of indent visible. Last option is not in
+        // sync with function parameter.
+        */
+        val expectedCode =
+            """
+            val foo1 = $MULTILINE_STRING_QUOTE
+                line1
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            val foo2 =
+                $MULTILINE_STRING_QUOTE
+                line2
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            val foo3 = // comment
+                $MULTILINE_STRING_QUOTE
+                line3
+                $MULTILINE_STRING_QUOTE.trimIndent()
+            """.trimIndent()
+        assertThat(
+            IndentationRule().lint(code)
+        ).isEqualTo(
+            listOf(
+                LintError(2, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(6, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(10, 1, "indent", "Unexpected indent of multiline string"),
+            )
+        )
+        assertThat(IndentationRule().format(code)).isEqualTo(expectedCode)
+    }
+
+    @Test
+    fun `format variable in class with multiline string value`() {
+        val code =
+            """
+            class C {
+                val CONFIG_COMPACT1 = $MULTILINE_STRING_QUOTE
+                        {
+                        }
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+                val CONFIG_COMPACT2 = // comment
+                    $MULTILINE_STRING_QUOTE
+                        {
+                        }
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+            }
+            """.trimIndent()
+        val expectedCode =
+            """
+            class C {
+                val CONFIG_COMPACT1 = $MULTILINE_STRING_QUOTE
+                    {
+                    }
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+                val CONFIG_COMPACT2 = // comment
+                    $MULTILINE_STRING_QUOTE
+                    {
+                    }
+                    $MULTILINE_STRING_QUOTE.trimIndent()
+            }
+            """.trimIndent()
+        assertThat(
+            IndentationRule().lint(code)
+        ).isEqualTo(
+            listOf(
+                LintError(3, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(4, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(8, 1, "indent", "Unexpected indent of multiline string"),
+                LintError(9, 1, "indent", "Unexpected indent of multiline string"),
+            )
+        )
+        assertThat(IndentationRule().format(code)).isEqualTo(expectedCode)
+    }
+
+    @Test
     fun `lint if-condition with line break and multiline call expression is indented properly`() {
         assertThat(
             IndentationRule().lint(
