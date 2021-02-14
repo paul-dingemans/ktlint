@@ -4,9 +4,9 @@ plugins {
 }
 
 ext.versions = [
-  'kotlin': gradle.ext.isKotlinDev ? "1.4.20-M1" : "1.4.10",
-  'gradle': '6.6',
-  'gradle-sha256': 'e6f83508f0970452f56197f610d13c5f593baaf43c0e3c6a571e5967be754025'
+  'kotlin': gradle.ext.isKotlinDev ? "1.4.30-RC" : "1.4.10",
+  'gradle': '6.8.1',
+  'gradle-sha256': 'fd591a34af7385730970399f473afabdb8b28d57fd97d6625c388d090039d6fd'
 ]
 
 ext.deps = [
@@ -15,7 +15,7 @@ ext.deps = [
     'compiler': "org.jetbrains.kotlin:kotlin-compiler-embeddable:${versions.kotlin}"
   ],
   'klob'          : 'com.github.shyiko.klob:klob:0.2.1',
-  ec4j            : 'org.ec4j.core:ec4j-core:0.2.2',
+  ec4j            : 'org.ec4j.core:ec4j-core:0.3.0',
   'picocli'       : 'info.picocli:picocli:3.9.6',
   // Testing libraries
   'junit'         : 'junit:junit:4.13.1',

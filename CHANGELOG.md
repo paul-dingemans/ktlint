@@ -14,6 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Internal error (`no-unused-imports`) ([#996](https://github.com/pinterest/ktlint/issues/996))
 - Fix false positive when argument list is after multiline dot-qualified expression (`argument-list-wrapping`) ([#893](https://github.com/pinterest/ktlint/issues/893))
 - Fix indentation for function types after a newline (`indent`) ([#918](https://github.com/pinterest/ktlint/issues/918))
+- Don't remove the equals sign for a default argument (`no-line-break-before-assignment`) ([#1039](https://github.com/pinterest/ktlint/issues/1039))
+- Fix internal error in `no-unused-imports` ([#1040](https://github.com/pinterest/ktlint/issues/1040))
+- Fix false positives when declaration has tail comments (`spacing-between-declarations-with-comments`) ([#1053](https://github.com/pinterest/ktlint/issues/1053))
+- Fix false positive after `else` keyword (`argument-list-wrapping`) ([#1047](https://github.com/pinterest/ktlint/issues/1047))
+- Fix formatting with comments (`colon-spacing`) ([#1057](https://github.com/pinterest/ktlint/issues/1057))
 
 ### Changed
 - Update Gradle shadow plugin to `6.1.0` version
@@ -23,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   that the Kotlin IDE plugin and ktlint use same imports layout ([#753](https://github.com/pinterest/ktlint/issues/753))
 - Deprecated `idea` and `ascii` shortcuts as the `ij_kotlin_imports_layout` property does not support those. 
   Please check README on how to achieve those with patterns ([#753](https://github.com/pinterest/ktlint/issues/753))
+- Update Gradle to `6.8.1` version
 
 ### Removed
 
